@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>子组件与父组件相互传值</title>
+		<script type="text/javascript" src="lib/Vue.js"></script>
+	</head>
+
+	<body>
+		<div id="example">
+			<my-component v-on:setmess="getmess" :message="message"></my-component>
+		</div>
+	</body>
+	<script>
+		//子组件
+		var child = {
+			props: ['message'],
+			data: function() {
+				return {
+					childMessage: vm.message
+				}
+			},
+			template: '<div><div>父组件传的值是：{{childMessage}}</div><button type="button" v-on:click="passClick">向父组件传值</button></div>',
+			methods: {
+				passClick: function() {
+					vm.$emit('setmess', {
+						id: 0,
+						name: vm.childMessage
+					});
+				}
+			},
+			beforeCreate: function() { //组件初始化
+				vm = this;
+			}
+		};
+		new Vue({
+			el: '#example',
+			data: {
+				message: '1234'
+			},
+			methods: {
+				getmess: function(result) {
+					alert('父组件接受到的值是' + result.name);
+				}
+			},
+			components: {
+				'my-component': child
+			}
+		});
+	</script>
+
+</html>

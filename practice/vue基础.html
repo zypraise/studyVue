@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Document</title>
+		<script type="text/javascript" src="lib/Vue.js"></script>
+		<style type="text/css">
+			.bold {
+				font-weight: bold;
+			}
+			
+			.big {
+				font-size: 20px;
+			}
+			
+			.color {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="app">
+			<div class="color" v-bind:class="{bold:isbold,big:isbig}">message：{{message}}</div>
+			<button v-on:click="removebold">去掉加粗</button>
+			<button v-on:click="removebig">去掉大号</button>
+			<div v-bind:class="[isbold ? 'bold' : '', isbig ? 'big' : '']">message：于是10比较（过滤器）：{{message|compare(10)|addtext}}</div>
+			<div>message+1等于（计算属性）：{{addmessage}}</div>
+			<button type="button" v-on:click="reverseMessage">按钮</button>
+			<button type="button" v-on:click="addList">添加</button>
+			<my-view v-bind:aa="list"></my-view>
+			<h3>条件渲染</h3>
+			<button type="button" v-on:click="tabBut(1)">渲染1</button>
+			<button type="button" v-on:click="tabBut(2)">渲染2</button>
+			<button type="button" v-on:click="tabBut(3)">渲染3</button>
+			<div v-if="tab==1">
+				<input type="text" />
+			</div>
+			<div v-else-if="tab==2">这里是2</div>
+			<div v-else="tab==3">这里是3</div>
+			<div v-show="tab==1">
+				<input type="text" />
+			</div>
+			<div v-show="tab==2">这里是2</div>
+			<div v-show="tab==3">这里是3</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		Vue.component('my-view', {
+			props: ['aa'],
+			template: "<div><p v-for='item in aa'>{{item.id+item.name}}</p></div>"
+		});
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				isbold: true,
+				isbig: true,
+				message: '4321',
+				tab:1,
+				list: [{
+						id: "0",
+						name: '小明'
+					},
+					{
+						id: "1",
+						name: '小芳'
+					}
+				]
+			},
+			methods: {
+				start: function() {
+					alert('开始了');
+				},
+				reverseMessage: function() {
+					vm.message = '10';
+				},
+				addList: function() {
+					vm.list.push({
+						id: '3',
+						name: '小兰'
+					});
+				},
+				removebold: function() {
+					vm.isbold = false;
+				},
+				removebig: function() {
+					vm.isbig = false;
+				},
+				tabBut:function(num){
+					vm.tab = num;
+				}
+			},
+			filters: {
+				//自定义过滤器
+				compare: function(val, num) {
+					//第一个参数为message 第二个参数为过滤器传的第一个参数 以此类推
+					if(val > num) {
+						return '大';
+					}
+					if(val < num) {
+						return '小';
+					}
+					if(val == num) {
+						return '等';
+					}
+				},
+				//过滤器可串连
+				addtext: function(val) {
+					return val + '于message';
+				}
+			},
+			computed: {
+				//计算属性 一些属性是种依赖与其他属性变化而变化
+				addmessage: function() {
+					return +vm.message + 1;
+				}
+			},
+			watch: {
+				list: function(newVal, oldVal) {
+					console.log('list也变了');
+					console.log(oldVal);
+					console.log(newVal);
+				},
+				message: function(newVal, oldVal) {
+					console.log('message变了');
+					console.log(oldVal);
+					console.log(newVal);
+				}
+			},
+			beforeCreate: function() {
+				//组件初始化
+				vm = this;
+			},
+			created: function() {
+				//还没将data中的数据渲染到页面上
+			},
+			mounted: function() {
+				//data中的数据已经渲染到页面上
+				vm.start();
+			}
+		});
+		vm.$watch('message', function(newVal, oldVal) {
+			alert('数据改变了');
+		})
+	</script>
+
+</html>
